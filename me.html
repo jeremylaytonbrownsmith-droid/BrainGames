@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Brain Sprint</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Brain Sprint">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#fff0f4">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Lexend:wght@400;600&display=swap">
+<style>
+/* Layout: chunky sticker-style cards with hard offset shadows, brain mascot in the header */
+:root{
+  --bg:#fff0f4;--surface:#ffffff;--fg:#2a1533;--muted:#77597e;--line:#2a1533;
+  --accent:#f0507f;--accent-soft:#ffd9e5;--warm:#ffbf1f;--good:#14966a;--shadow:#2a1533;
+  --display:"Fredoka",ui-rounded,system-ui,sans-serif;
+  --body:"Lexend",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1c0f22;--surface:#2b1934;--fg:#fdebf2;--muted:#c9a9cf;--line:#fdebf2;
+  --accent:#ff6f9c;--accent-soft:#4b2342;--warm:#ffc94a;--good:#3fd19a;--shadow:#000000;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1c0f22;--surface:#2b1934;--fg:#fdebf2;--muted:#c9a9cf;--line:#fdebf2;
+  --accent:#ff6f9c;--accent-soft:#4b2342;--warm:#ffc94a;--good:#3fd19a;--shadow:#000000;color-scheme:dark}
+header{display:flex;gap:14px;align-items:center}
+.brain{width:96px;height:auto;flex:none;transform-origin:50% 80%}
+.brain.go{animation:wiggle .6s ease-in-out 2}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg) scale(1.05)}75%{transform:rotate(8deg) scale(1.05)}}
+.big60{font-family:var(--display);font-weight:700;font-size:1.5rem;line-height:1.2;margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.big60 span{background:var(--warm);color:#2a1533;padding:4px 14px;border-radius:12px;border:2px solid var(--line);font-size:2.1rem;line-height:1.1;white-space:nowrap;box-shadow:3px 3px 0 var(--shadow)}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1{font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1;margin:0;text-wrap:balance;color:var(--accent)}
+h2{font-family:var(--display);font-weight:600;font-size:1.3rem;margin:0}
+.sub{color:var(--muted);margin:4px 0 0}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:8px 12px;font-size:.85rem;color:var(--muted)}
+.stat b{color:var(--fg);font-variant-numeric:tabular-nums;font-size:1rem}
+.picker{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:640px){.picker{grid-template-columns:repeat(2,1fr)}}
+[hidden]{display:none!important}
+.verse{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:4px 4px 0 var(--shadow);display:flex;flex-direction:column;gap:6px}
+.verse .lab{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.verse p{margin:0;font-size:1.08rem;line-height:1.55;max-width:65ch}
+.verse .ref{font-family:var(--display);font-weight:700;color:var(--accent)}
+.verse h2{font-size:1.5rem;color:var(--fg)}
+.verse .vq{font-style:italic}
+.verse summary{cursor:pointer;font-family:var(--display);font-weight:700;font-size:1rem;background:var(--accent-soft);border:2px solid var(--line);border-radius:999px;padding:8px 16px;display:inline-block;list-style:none;margin-top:4px}
+.verse summary::-webkit-details-marker{display:none}
+.verse summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.verse details[open] summary{margin-bottom:10px}
+.verse .vbody{display:flex;flex-direction:column;gap:10px}
+.verse .pray{font-family:var(--display);font-weight:500;font-size:1.05rem;color:var(--accent)}
+.verse .pray::before{content:"Prayer: ";color:var(--muted);font-weight:700}
+.pick.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap}
+.pick.wide .d{flex:1}
+.stage{position:relative;width:100%;max-width:340px;aspect-ratio:1;margin:0 auto}
+.bbrain{position:absolute;left:50%;top:50%;width:46%;transform:translate(-50%,-50%) scale(.82);transform-origin:50% 55%}
+.bbrain.in{transition:transform 4s ease-in-out;transform:translate(-50%,-50%) scale(1.12)}
+.bbrain.out{transition:transform 6s ease-in-out;transform:translate(-50%,-50%) scale(.82)}
+.bub{position:absolute;transform:translate(-50%,-50%);font-size:.74rem!important;background:var(--surface);color:var(--fg);border:2px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.8rem;font-weight:600;white-space:nowrap;box-shadow:2px 2px 0 var(--shadow);animation:bob 3s ease-in-out infinite;transition:opacity 3s ease,filter 3s ease,translate 3s ease,scale 3s ease}
+.bub::after{content:"";position:absolute;width:8px;height:8px;border:2px solid var(--line);border-radius:50%;background:var(--surface);left:50%;bottom:-12px}
+.bub.gone{opacity:0;filter:blur(4px);translate:0 -36px;scale:.4}
+@keyframes bob{0%,100%{margin-top:0}50%{margin-top:-5px}}
+.cue{text-align:center;display:flex;flex-direction:column;gap:2px;align-items:center}
+.cue .word{font-family:var(--display);font-weight:700;font-size:2rem;line-height:1.1;color:var(--accent)}
+.cue .count{font-family:var(--display);font-size:1.2rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.calm{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.es{font-family:var(--display);font-weight:700;font-size:1.9rem;line-height:1.15;color:var(--accent);margin:0;text-wrap:balance}
+.en{font-size:1.1rem;color:var(--muted);margin:0}
+.flash{background:var(--accent-soft);border:2px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center}
+.flash .txt{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.flash b{font-family:var(--display);font-size:1.3rem;line-height:1.2;color:var(--accent)}
+.flash span{color:var(--fg)}
+.spk{font:inherit;font-size:1.2rem;flex:none;width:44px;height:44px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;display:grid;place-items:center;box-shadow:2px 2px 0 var(--shadow)}
+.spk:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--shadow)}
+.qhead{display:flex;gap:12px;align-items:center}
+.qhead .es{flex:1;min-width:0}
+.sound{font-size:.9rem;color:var(--muted);display:flex;gap:8px;align-items:center}
+.review{display:flex;flex-direction:column;gap:6px}
+.review div{display:flex;gap:10px;align-items:center;border-bottom:1px dashed var(--muted);padding-bottom:6px}
+.review .mk{font-weight:700;width:1.2em;flex:none}
+.review .ok{color:var(--good)} .review .no{color:var(--warm)}
+.review b{font-family:var(--display);color:var(--accent)}
+.review .pair{display:flex;flex-direction:column;flex:1;min-width:0}
+.review .spk{width:36px;height:36px;font-size:1rem}
+.pick{font:inherit;text-align:left;background:var(--surface);color:var(--fg);border:2px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;box-shadow:3px 3px 0 var(--shadow);transition:transform .1s,box-shadow .1s}
+.pick:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--shadow)}
+.pick[aria-pressed="true"]{background:var(--accent-soft);transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.pick .t{font-family:var(--display);font-weight:600;font-size:1.05rem}
+.pick .d{font-size:.82rem;color:var(--muted)}
+.pick .done{font-size:.75rem;color:var(--good);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0;box-shadow:5px 5px 0 var(--shadow)}
+.timer{font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1;font-variant-numeric:tabular-nums;background:var(--accent);color:#fff;border:2px solid var(--line);border-radius:999px;min-width:3.4ch;padding:6px 14px;text-align:center}
+.timer.low{background:var(--warm);color:#2a1533}
+.prompt{font-size:1.15rem}
+.prompt b{font-family:var(--display);font-size:1.6rem;color:var(--accent)}
+.btn{font-family:var(--display);font-size:1.1rem;font-weight:700;background:var(--accent);color:#fff;border:2px solid var(--line);border-radius:999px;padding:10px 22px;cursor:pointer;align-self:flex-start;box-shadow:3px 3px 0 var(--shadow);transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.btn.ghost{background:var(--surface);color:var(--fg)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type=text]{font:inherit;font-size:1.1rem;width:100%;padding:12px;border:2px solid var(--line);border-radius:14px;background:var(--bg);color:var(--fg)}
+input[type=text]:focus,.btn:focus-visible,.pick:focus-visible,.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--accent-soft);border:1.5px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.9rem}
+.chip.miss{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+.words{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-family:var(--display);font-weight:600;font-size:1.25rem}
+.passage{font-size:1.05rem;max-width:65ch}
+.opt{font:inherit;text-align:left;width:100%;background:var(--bg);color:var(--fg);border:2px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer}
+.opt.right{background:var(--good);color:#fff} .opt.wrong{background:var(--warm);color:#2a1533}
+.score{font-family:var(--display);font-weight:700;font-size:2.2rem;color:var(--accent)}
+.note{font-size:.82rem;color:var(--muted)}
+.stats{align-items:center}
+.sharebtn{font-family:var(--display);font-weight:700;font-size:.95rem;background:var(--warm);color:#2a1533;border:2px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--shadow)}
+.sharebtn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--shadow)}
+.sharebtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sharebox{background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:4px 4px 0 var(--shadow)}
+.sharebox pre{margin:0;font-family:var(--body);font-size:1rem;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}
+.toast{font-weight:700;color:var(--good)}
+label.sel{font-size:.9rem;color:var(--muted);display:flex;gap:6px;align-items:center}
+select{font:inherit;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <svg class="brain" id="brain" viewBox="0 0 120 100" aria-hidden="true">
+      <path d="M32 86c-14 1-24-9-22-22-9-6-9-21 1-27-1-15 14-24 27-18 6-11 23-13 31-4 11-7 27-2 31 11 13 2 19 15 14 26 8 8 5 23-8 27-2 11-15 15-25 10-9 6-23 6-31-2-6 2-13 1-18-1z" fill="var(--accent)" stroke="var(--line)" stroke-width="3.5" stroke-linejoin="round"/>
+      <g fill="none" stroke="var(--line)" stroke-width="2.5" stroke-linecap="round" opacity=".55">
+        <path d="M60 16c-5 8 4 13-1 21"/>
+        <path d="M28 30c6-2 10 2 9 8"/>
+        <path d="M90 28c-6-1-10 4-7 9"/>
+        <path d="M18 56c6 0 9-4 8-9"/>
+        <path d="M102 58c-6 1-10-3-9-8"/>
+        <path d="M42 84c2-6 8-7 12-4"/>
+        <path d="M80 84c-2-6-8-7-12-4"/>
+      </g>
+      <circle cx="46" cy="54" r="9" fill="#fff" stroke="var(--line)" stroke-width="2.5"/>
+      <circle cx="74" cy="54" r="9" fill="#fff" stroke="var(--line)" stroke-width="2.5"/>
+      <circle cx="48" cy="55" r="4" fill="#2a1533"/>
+      <circle cx="76" cy="55" r="4" fill="#2a1533"/>
+      <path d="M52 70q8 8 16 0" fill="none" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1>Brain Sprint</h1>
+      <p class="sub">Quick drills for word memory and speed. About 5 minutes a day.</p>
+    </div>
+  </header>
+  <section class="verse" id="dailyVerse" hidden><span class="lab">Today's word</span><h2 id="vtitle"></h2><p id="vt" class="vq"></p><span class="ref" id="vr"></span>
+    <details id="vdet"><summary>Read today's devotional</summary><div class="vbody"><p id="vbody"></p><p class="pray" id="vpray"></p></div></details></section>
+  <div class="stats">
+    <div class="stat">Streak <b id="streak">0</b> days</div>
+    <div class="stat">Today <b id="todayCount">0</b>/5 done</div>
+    <button class="sharebtn" id="shareTop">Share my scores</button>
+  </div>
+  <div class="sharebox" id="shareBox" hidden>
+    <pre id="shareText"></pre>
+    <div class="row"><span class="toast" id="shareMsg"></span><button class="btn ghost" id="shareClose">Close</button></div>
+  </div>
+  <div class="picker" role="group" aria-label="Choose a drill">
+    <button class="pick" id="p-word" data-drill="word" aria-pressed="true"><span class="t">Word Sprint</span><span class="d">60 sec verbal fluency</span><span class="done" hidden>Done today</span></button>
+    <button class="pick" id="p-recall" data-drill="recall" aria-pressed="false"><span class="t">Rapid Recall</span><span class="d">Memorize 10, recall</span><span class="done" hidden>Done today</span></button>
+    <button class="pick" id="p-read" data-drill="read" aria-pressed="false"><span class="t">Speed Read</span><span class="d">Read fast, answer 3</span><span class="done" hidden>Done today</span></button>
+    <button class="pick" id="p-spanish" data-drill="spanish" aria-pressed="false"><span class="t">Spanish Sprint</span><span class="d">Phrases, pick the meaning</span><span class="done" hidden>Done today</span></button>
+    <button class="pick wide" id="p-breathe" data-drill="breathe" aria-pressed="false"><span class="t">Breathe</span><span class="d">1 minute cooldown to finish</span><span class="done" hidden>Done today</span></button>
+  </div>
+  <section class="panel" id="panel" aria-live="polite"></section>
+  <p class="note">Progress is saved on this device only. These drills are practice, not treatment. Persistent brain fog is worth raising with a doctor.</p>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const today=()=>new Date().toLocaleDateString('en-CA');
+let log=store.get('bs-log',{});
+let best=store.get('bs-best',{});
+let timer=null;
+const stopTimer=()=>{if(timer){clearInterval(timer);timer=null}};
+function countdown(sec,el,onEnd){stopTimer();const b=$('#brain');b.classList.remove('go');void b.getBoundingClientRect();b.classList.add('go');let t=sec;const draw=()=>{el.textContent=t;el.classList.toggle('low',t<=10)};draw();
+  timer=setInterval(()=>{t--;draw();if(t<=0){stopTimer();onEnd()}},1000)}
+function record(drill,score){const d=today();log[d]=log[d]||{};log[d][drill]=Math.max(log[d][drill]||0,score);
+  const isBest=score>(best[drill]||0);if(isBest)best[drill]=score;store.set('bs-log',log);store.set('bs-best',best);refresh();
+  setTimeout(()=>{const rows=document.querySelectorAll('#panel .row');const row=rows[rows.length-1];
+    if(row&&!row.querySelector('.sharebtn')){const b=document.createElement('button');b.className='sharebtn';b.textContent='Share my scores';b.onclick=shareScores;row.appendChild(b)}},0);
+  return isBest}
+const LINK='https://jeremylaytonbrownsmith-droid.github.io/BrainGames/';
+function shareText(){const d=log[today()]||{},dt=new Date();const lines=[`🧠 Brain Sprint ${dt.getMonth()+1}/${dt.getDate()}`];
+  const f=(k,lab,fmt)=>lines.push(`${lab}: ${k in d?fmt(d[k]):'not played'}`);
+  f('word','Word Sprint',v=>v+' words');f('recall','Rapid Recall',v=>v+'/10');f('read','Speed Read',v=>v+'/3');f('spanish','Spanish Sprint',v=>v+' correct');if('breathe' in d)lines.push('Breathe: done 🫧');
+  const st=+$('#streak').textContent;if(st>1)lines.push(`🔥 ${st} day streak`);lines.push('',`Play: ${LINK}`);return lines.join('\n')}
+function shareScores(){const t=shareText();$('#shareText').textContent=t;$('#shareBox').hidden=false;$('#shareMsg').textContent='';
+  $('#shareBox').scrollIntoView({behavior:'smooth',block:'nearest'});
+  const fallback=()=>{const sel=getSelection(),rg=document.createRange();rg.selectNodeContents($('#shareText'));sel.removeAllRanges();sel.addRange(rg);
+    $('#shareMsg').textContent='Press and hold the text to copy it.'};
+  try{navigator.clipboard.writeText(t).then(()=>{$('#shareMsg').textContent='Copied. Paste it in your group text.'},fallback)}catch(e){fallback()}}
+function refresh(){const d=log[today()]||{};$('#todayCount').textContent=Object.keys(d).length;$('#shareTop').hidden=!Object.keys(d).length;
+  ['word','recall','read','spanish','breathe'].forEach(k=>$('#p-'+k+' .done').hidden=!(k in d));
+  let s=0,dt=new Date();if(!log[today()])dt.setDate(dt.getDate()-1);
+  while(log[dt.toLocaleDateString('en-CA')]){s++;dt.setDate(dt.getDate()-1)}$('#streak').textContent=s}
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const pickOne=a=>a[Math.random()*a.length|0];
+
+/* ---------- Word Sprint ---------- */
+const LETTERS='ABCDEFGHILMNOPRSTW'.split('');
+const CATS=['animals','foods','things in a kitchen','jobs','sports','countries','body parts','things that are green','clothing','musical instruments','things at a beach','tools',
+ 'fruits and vegetables','things in a classroom','car brands','cities in the US','things that are round','birds','things in a bathroom','board games and card games',
+ 'things that fly','pizza toppings','things that are cold','ocean animals','flowers and plants','things you can buy at a hardware store','words that rhyme with cat',
+ 'desserts','furniture','things in a hospital','breakfast foods','things that are red','insects and bugs','things in a garage','TV shows','holidays',
+ 'things with wheels','school subjects','things you take on a trip','verbs (action words)','things made of wood','drinks','things on a soccer field','emotions and feelings'];
+function word(){stopTimer();const mode=Math.random()<.5?'letter':'cat';const target=mode==='letter'?pickOne(LETTERS):pickOne(CATS);
+  $('#panel').innerHTML=`<p class="big60">You have <span>60 seconds</span> to do this.</p>
+  <p class="prompt">${mode==='letter'?`Type as many words as you can that start with <b>${target}</b>.`:`Name as many <b>${target}</b> as you can.`}</p>
+  <p class="note">Press Enter after each word. No repeats. Best: ${best.word||0}</p>
+  <button class="btn" id="go">Start 60 seconds</button>`;
+  $('#go').onclick=()=>{const found=new Set();
+    $('#panel').innerHTML=`<div class="row" style="justify-content:space-between"><h2>Word Sprint</h2><div class="timer" id="t">60</div></div>
+    <p class="prompt">${mode==='letter'?`Starts with <b>${target}</b>`:`<b>${target}</b>`}</p>
+    <input type="text" id="w" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type a word, press Enter">
+    <div class="chips" id="c"></div>`;
+    const inp=$('#w');inp.focus();
+    inp.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const v=inp.value.trim().toLowerCase();inp.value='';
+      if(v.length<2||found.has(v))return;if(mode==='letter'&&v[0]!==target.toLowerCase())return;
+      found.add(v);$('#c').insertAdjacentHTML('afterbegin',`<span class="chip">${v.replace(/</g,'')}</span>`)};
+    countdown(60,$('#t'),()=>{const n=found.size,nb=record('word',n);
+      $('#panel').innerHTML=`<h2>Word Sprint</h2><div class="score">${n} words</div>
+      <p>${nb?'New personal best.':'Best so far: '+best.word+'.'} Most adults land between 12 and 20.</p>
+      <div class="chips">${[...found].map(w=>`<span class="chip">${w.replace(/</g,'')}</span>`).join('')}</div>
+      <div class="row"><button class="btn" id="again">New prompt</button><button class="btn ghost" id="next">Next: Rapid Recall</button></div>`;
+      $('#again').onclick=word;$('#next').onclick=()=>select('recall')})}}
+
+/* ---------- Rapid Recall ---------- */
+const POOL='anchor basket candle desert engine feather garden hammer island jacket kettle ladder magnet needle orange pillow rocket saddle tunnel violin wallet zipper blanket cactus dolphin envelope forest guitar helmet igloo jungle lemon mirror napkin oyster parrot quilt river spoon tiger umbrella velvet window yogurt bridge castle drum falcon glacier harbor lantern meadow pebble'.split(' ');
+function recall(){stopTimer();
+  $('#panel').innerHTML=`<p class="big60">Memorize 10 words in <span>30 seconds</span></p><p>Then you have 60 seconds to type back as many as you can. Best: ${best.recall||0}/10</p>
+  <p class="note">Tip: link the words into a quick silly story.</p><button class="btn" id="go">Show words</button>`;
+  $('#go').onclick=()=>{const list=shuffle(POOL).slice(0,10);
+    $('#panel').innerHTML=`<div class="row" style="justify-content:space-between"><h2>Memorize</h2><div class="timer" id="t">30</div></div>
+    <div class="words">${list.map(w=>`<span>${w}</span>`).join('')}</div><button class="btn ghost" id="ready">I'm ready</button>`;
+    const phase2=()=>{stopTimer();const got=new Set();
+      $('#panel').innerHTML=`<div class="row" style="justify-content:space-between"><h2>Recall</h2><div class="timer" id="t">60</div></div>
+      <input type="text" id="w" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type a word, press Enter">
+      <div class="chips" id="c"></div><button class="btn ghost" id="fin">I'm done</button>`;
+      const inp=$('#w');inp.focus();
+      const end=()=>{stopTimer();const n=got.size,nb=record('recall',n);
+        $('#panel').innerHTML=`<h2>Rapid Recall</h2><div class="score">${n}/10</div><p>${nb?'New personal best.':'Best so far: '+best.recall+'/10.'}</p>
+        <div class="chips">${list.map(w=>`<span class="chip ${got.has(w)?'':'miss'}">${w}</span>`).join('')}</div>
+        <div class="row"><button class="btn" id="again">New list</button><button class="btn ghost" id="next">Next: Speed Read</button></div>`;
+        $('#again').onclick=recall;$('#next').onclick=()=>select('read')};
+      inp.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const v=inp.value.trim().toLowerCase();inp.value='';
+        if(list.includes(v)&&!got.has(v)){got.add(v);$('#c').insertAdjacentHTML('beforeend',`<span class="chip">${v}</span>`);if(got.size===10)end()}};
+      $('#fin').onclick=end;countdown(60,$('#t'),end)};
+    $('#ready').onclick=phase2;countdown(30,$('#t'),phase2)}}
+
+/* ---------- Speed Read ---------- */
+const PASSAGES=[
+{text:"The honeybee colony works as a single organism. A queen lays up to two thousand eggs a day, while worker bees, all female, divide labor by age. Young workers clean cells and feed larvae. Middle-aged workers build wax comb and guard the entrance. The oldest workers become foragers, flying up to three miles to collect nectar and pollen. When a forager finds a rich patch of flowers, she returns and performs a waggle dance. The angle of the dance shows the direction relative to the sun, and the length of the waggle shows the distance. Other workers follow the dance and fly straight to the source. Male bees, called drones, do no foraging. Their only job is to mate with a queen from another colony, and in autumn the workers push them out of the hive.",
+ q:[["Which bees become foragers?",["The youngest workers","The oldest workers","The drones","The queen"],1],
+    ["What does the angle of the waggle dance show?",["Distance to flowers","Amount of nectar","Direction relative to the sun","Danger nearby"],2],
+    ["What happens to drones in autumn?",["They become foragers","They guard the entrance","They are pushed out","They raise a new queen"],2]]},
+{text:"In 1854, a cholera outbreak struck the Soho district of London, killing more than five hundred people in ten days. Most doctors at the time believed disease spread through bad air, which they called miasma. A physician named John Snow doubted this. He interviewed families and marked each death on a street map. The deaths clustered tightly around a public water pump on Broad Street. Snow even found that workers at a nearby brewery, who drank beer instead of pump water, had stayed healthy. He presented his evidence to local officials, who agreed to remove the pump's handle. New cases soon dropped. Snow's map became a founding document of epidemiology, the study of how disease spreads through populations, and it showed the power of plotting data in space.",
+ q:[["What did most doctors blame for disease in 1854?",["Contaminated water","Bad air","Insects","Spoiled food"],1],
+    ["Why did the brewery workers stay healthy?",["They lived far away","They drank beer, not pump water","They were vaccinated","They boiled their water"],1],
+    ["What did officials remove?",["The pump handle","The brewery","The street map","The sewer cover"],0]]},
+{text:"A soccer referee covers seven to eight miles in a professional match, often more than many players. Unlike players, the referee cannot rest during quiet spells and must stay within about twenty yards of play to judge fouls well. Positioning follows a diagonal system. The referee runs a path from one corner area toward the opposite corner, while two assistant referees patrol opposite touchlines, each covering one half of the field. This keeps play boxed between the referee and an assistant, so at least one official has a clear angle on most incidents. Since 2018, many top leagues also use video assistant referees, who review clear errors in four situations: goals, penalty decisions, direct red cards, and cases of mistaken identity. The on-field referee still makes the final call.",
+ q:[["About how far does a pro referee run in a match?",["Two to three miles","Four to five miles","Seven to eight miles","Twelve miles"],2],
+    ["How do the assistant referees divide the field?",["Each covers one half on opposite touchlines","Both stay near the goals","They switch every ten minutes","They stand at midfield"],0],
+    ["Which is NOT one of the four VAR review situations?",["Goals","Offside throw-ins","Direct red cards","Mistaken identity"],1]]},
+{text:"The octopus is one of the strangest animals in the ocean. It has three hearts. Two pump blood through the gills, and the third pumps it through the rest of the body. Its blood is blue because it carries oxygen with a copper-based molecule instead of the iron-based one humans use. The octopus also has a remarkable nervous system. About two thirds of its neurons sit in its eight arms rather than its central brain, so each arm can taste, touch, and react on its own. An arm can even keep grabbing at food after being separated from the body. Octopuses can squeeze through any opening larger than their beak, the only hard part of their body, and have been seen escaping from aquarium tanks at night.",
+ q:[["How many hearts does an octopus have?",["One","Two","Three","Eight"],2],
+    ["Why is octopus blood blue?",["It carries copper-based molecules","It lacks oxygen","It contains salt water","It reflects the ocean"],0],
+    ["Where are most of an octopus's neurons?",["In its central brain","In its arms","In its hearts","In its beak"],1]]},
+{text:"The Panama Canal opened in 1914 and cut thousands of miles off the trip between the Atlantic and Pacific oceans. Ships no longer had to sail around the southern tip of South America. The canal does not run at sea level the whole way. Instead, a series of locks lifts ships about 85 feet up to Gatun Lake, an artificial lake created by damming a river. Ships cross the lake and then step back down through more locks on the other side. The locks need no pumps. Water simply flows down from the lake by gravity to fill each chamber. A typical crossing takes eight to ten hours. Because each passage uses millions of gallons of fresh water, droughts can force the canal to limit traffic.",
+ q:[["When did the Panama Canal open?",["1869","1904","1914","1936"],2],
+    ["What fills the lock chambers?",["Large electric pumps","Ocean tides","Water flowing down from Gatun Lake","Rainwater tanks"],2],
+    ["What can force the canal to limit traffic?",["Hurricanes","Droughts","Earthquakes","Holidays"],1]]},
+{text:"A night of sleep is not one smooth stretch. The brain moves through cycles that last about ninety minutes each, and most adults complete four to six cycles a night. Each cycle includes light sleep, deep sleep, and REM sleep, named for the rapid eye movements that happen during it. Deep sleep is when the body does much of its physical repair, and it is concentrated in the first half of the night. REM sleep, when most vivid dreaming happens, grows longer in the later cycles toward morning. This is why cutting sleep short by waking very early tends to rob you of REM in particular. Researchers link REM to memory and emotional processing, while deep sleep helps the brain clear waste built up during the day.",
+ q:[["About how long is one sleep cycle?",["30 minutes","60 minutes","90 minutes","3 hours"],2],
+    ["When is deep sleep most concentrated?",["First half of the night","Right before waking","During naps only","Evenly all night"],0],
+    ["What does waking very early mostly cut short?",["Light sleep","Deep sleep","REM sleep","Nothing"],2]]},
+{text:"Before 1822, lighthouses used mirrors to push their light out to sea, but much of the light was wasted. That year a French physicist named Augustin Fresnel designed a new kind of lens. Instead of one thick curved piece of glass, which would have been enormously heavy, he built the lens from rings of glass prisms arranged around a central bulls-eye. Each ring bent light into a single strong beam. The design used far less glass and captured most of the light. Lighthouses fitted with large Fresnel lenses could be seen more than twenty miles away. The idea spread quickly around the world. Today the same principle shows up in car headlights, traffic signals, and the thin flat magnifiers people keep in their wallets.",
+ q:[["Who designed the lens?",["Thomas Edison","Augustin Fresnel","Isaac Newton","Louis Pasteur"],1],
+    ["What is the lens built from?",["One thick piece of glass","Rings of glass prisms","Polished metal mirrors","Plastic sheets"],1],
+    ["How far could the light be seen?",["About 2 miles","About 8 miles","More than 20 miles","Over 100 miles"],2]]},
+{text:"Maple syrup starts as a watery sap that is only about two percent sugar. To make a single gallon of syrup, producers boil down roughly forty gallons of sap, driving off the water as steam. The sap only runs well during a short window in late winter and early spring. It needs nights below freezing followed by days above freezing. That swing in temperature builds pressure inside the tree and pushes sap out through a small tap drilled into the trunk. A healthy tree can be tapped every year for decades without harm. The Canadian province of Quebec produces about seventy percent of the world's maple syrup and even keeps a strategic reserve of barrels to keep prices steady.",
+ q:[["About how much sap makes one gallon of syrup?",["5 gallons","10 gallons","40 gallons","100 gallons"],2],
+    ["What weather makes sap run?",["Hot days and warm nights","Freezing nights and warmer days","Steady rain","Constant snow"],1],
+    ["Which region produces most of the world's maple syrup?",["Vermont","Ontario","Quebec","Maine"],2]]},
+{text:"Every fall, monarch butterflies from eastern North America fly as far as three thousand miles to spend the winter in the mountain forests of central Mexico. They cluster by the millions on fir trees, so thickly that branches bend under their weight. What makes this journey remarkable is that no single butterfly makes the full round trip. Summer monarchs live only a few weeks. But the generation born in late summer is different. These butterflies delay breeding and can live around eight months, long enough to fly south, survive the winter, and begin the trip north in spring. Their children and grandchildren finish the return. Somehow each new fall generation finds the same forests, even though none of them has been there before.",
+ q:[["Where do eastern monarchs spend the winter?",["Florida","Central Mexico","Texas","Cuba"],1],
+    ["How long do summer monarchs usually live?",["A few days","A few weeks","Eight months","Two years"],1],
+    ["What is unusual about the late-summer generation?",["They cannot fly","They live much longer","They never migrate","They are larger"],1]]},
+{text:"In 1941, a Swiss engineer named George de Mestral came home from a walk in the Alps and noticed burrs stuck all over his pants and his dog's fur. Curious, he looked at one under a microscope. He saw that the burr was covered in tiny hooks that caught on anything with a loop, like fabric threads or hair. He spent years trying to copy the design with different materials. Cotton wore out too fast, but nylon worked. He patented his hook and loop fastener in 1955 and named it Velcro, a blend of the French words for velvet and hook. Sales were slow at first. The product took off after NASA used it to keep objects from floating away in spacecraft.",
+ q:[["What inspired the invention?",["A zipper","Burrs from a walk","A bird's feathers","Fishing nets"],1],
+    ["Which material finally worked?",["Cotton","Wool","Nylon","Leather"],2],
+    ["What helped Velcro sales take off?",["Shoe companies","NASA using it in spacecraft","The Olympics","Military uniforms"],1]]},
+{text:"Not all volcanoes behave the same way, and the difference comes down mostly to the lava. Shield volcanoes, like Mauna Loa in Hawaii, produce runny lava that flows easily for long distances. Layer after layer builds a broad mountain with gentle slopes, shaped a bit like a warrior's shield lying on the ground. Their eruptions are usually steady rather than violent. Stratovolcanoes, like Mount St. Helens in Washington, produce thick, sticky lava that traps gas. Pressure builds until it releases in a powerful explosion, throwing out ash and rock. These volcanoes form steep cone shapes. When Mount St. Helens erupted in 1980, the blast removed more than 1,300 feet from the top of the mountain.",
+ q:[["What kind of lava do shield volcanoes have?",["Thick and sticky","Runny","Solid","Frozen"],1],
+    ["Which is an example of a stratovolcano?",["Mauna Loa","Mount St. Helens","Kilauea","None of these"],1],
+    ["What did the 1980 eruption do?",["Created a new island","Removed over 1,300 feet of the peak","Lasted ten years","Formed a lake"],1]]},
+{text:"In December 1891, a physical education teacher named James Naismith was asked to invent an indoor game to keep students active during a cold New England winter in Springfield, Massachusetts. He nailed two peach baskets to the balcony railings at either end of the gym and wrote thirteen basic rules. Players used a soccer ball. The first game ended with a score of one to nothing. Because the baskets still had bottoms, someone had to climb a ladder to get the ball out after every score. Open-bottom nets came later. Naismith never made money from the game. He went on to coach at the University of Kansas, making him the only coach in that program's history with a losing record.",
+ q:[["What was Naismith's job?",["Football coach","Physical education teacher","Doctor","Carpenter"],1],
+    ["What did the first game use as goals?",["Metal hoops","Peach baskets","Buckets","Wooden boxes"],1],
+    ["What was the score of the first game?",["1 to 0","2 to 1","10 to 8","0 to 0"],0]]},
+{text:"Hummingbirds live life at full speed. Their hearts can beat more than 1,200 times a minute during flight, and their wings beat dozens of times per second, fast enough to produce the humming sound that gives them their name. They are the only birds that can truly fly backward, and they can hover in place like a helicopter while they feed. All this burns energy fast, so a hummingbird may visit hundreds of flowers a day and eat more than its body weight in nectar. At night, to avoid starving while it sleeps, a hummingbird can drop into a state called torpor. Its body temperature falls and its heart rate slows dramatically, saving energy until morning.",
+ q:[["How fast can a hummingbird's heart beat in flight?",["About 120 a minute","About 400 a minute","More than 1,200 a minute","About 60 a minute"],2],
+    ["What can hummingbirds do that other birds cannot?",["Fly backward","Swim","Sing at night","Fly in the rain"],0],
+    ["What is torpor?",["A mating dance","A deep energy-saving state","A type of nectar","A migration route"],1]]},
+{text:"In May 1804, the Corps of Discovery, led by Meriwether Lewis and William Clark, set out from near St. Louis to explore the land recently gained in the Louisiana Purchase. President Thomas Jefferson hoped they would find a water route to the Pacific Ocean. They did not, because the Rocky Mountains stood in the way. A young Shoshone woman named Sacagawea joined the group as an interpreter, traveling with her infant son. Her presence helped show other tribes that the party was not a war group. The expedition reached the Pacific coast in November 1805 and spent a wet winter at a small post they called Fort Clatsop. They returned to St. Louis in 1806.",
+ q:[["What land were they exploring?",["Texas","The Louisiana Purchase","Alaska","Florida"],1],
+    ["What role did Sacagawea have?",["Guide and cook","Interpreter","Mapmaker","Hunter"],1],
+    ["Where did they spend the winter on the coast?",["Fort Clatsop","Fort Mandan","Fort Sumter","St. Louis"],0]]},
+{text:"A popular legend says coffee was discovered in Ethiopia by a goat herder named Kaldi, who noticed his goats became unusually lively after eating red berries from a certain shrub. Whether or not the story is true, coffee does come from a fruit. The beans are actually the seeds inside a small red fruit called a coffee cherry. Two species dominate the world's supply. Arabica grows best at high elevations, has a smoother flavor, and makes up most of the coffee sold. Robusta grows at lower elevations, tolerates heat and pests better, and contains roughly twice as much caffeine. That extra caffeine helps protect the plant, since caffeine is bitter and works as a natural insect repellent.",
+ q:[["What are coffee beans, botanically?",["Nuts","Seeds of a fruit","Roots","Dried leaves"],1],
+    ["Which species has more caffeine?",["Arabica","Robusta","Both equal","Neither has caffeine"],1],
+    ["Why does the plant make caffeine?",["To attract birds","To repel insects","To store water","To grow faster"],1]]},
+{text:"Ocean tides are driven mainly by the moon's gravity. The moon pulls the ocean toward it, creating a bulge of water on the side of Earth facing the moon. A second bulge forms on the opposite side. As Earth rotates through both bulges, most coastlines see two high tides and two low tides about every twenty-five hours. The sun affects tides too, though less strongly. When the sun and moon line up, during the new moon and full moon, their pulls combine to make spring tides, with extra high highs and extra low lows. The name has nothing to do with the season. When the sun and moon pull at right angles, during the quarter moons, the result is weaker neap tides.",
+ q:[["What mainly causes tides?",["Wind","The moon's gravity","Earth's core","Ocean currents"],1],
+    ["When do spring tides happen?",["Only in spring","At new and full moon","At quarter moons","During storms"],1],
+    ["What are the weaker tides called?",["Neap tides","Ebb tides","Slack tides","Low tides"],0]]},
+{text:"On December 17, 1903, near Kitty Hawk, North Carolina, Orville and Wilbur Wright made the first controlled, powered airplane flight. The brothers ran a bicycle shop in Dayton, Ohio, and used money from the business to fund their experiments. They chose the Outer Banks because of its steady winds and soft sand for landings. Orville piloted the first flight, which lasted twelve seconds and covered about 120 feet, shorter than the wingspan of many modern jets. The brothers took turns and made four flights that day. The longest, flown by Wilbur, lasted 59 seconds and covered 852 feet. Shortly after, a gust of wind flipped the plane and damaged it, so it never flew again.",
+ q:[["What business did the Wright brothers run?",["A newspaper","A bicycle shop","A farm","A hardware store"],1],
+    ["Who piloted the very first flight?",["Wilbur","Orville","A hired pilot","Both together"],1],
+    ["How long was the longest flight that day?",["12 seconds","30 seconds","59 seconds","5 minutes"],2]]},
+{text:"In 1928, Scottish scientist Alexander Fleming returned from a summer vacation to his messy London lab. He noticed that one of his dishes of bacteria had grown a patch of mold, and around the mold the bacteria had died. Fleming identified the mold and named the substance it produced penicillin. But he struggled to purify it, and for over a decade it saw little use. During World War II, a team at Oxford led by Howard Florey and Ernst Chain figured out how to produce penicillin in large amounts. By D-Day in 1944, there was enough to treat wounded Allied soldiers. Fleming, Florey, and Chain shared the Nobel Prize in 1945.",
+ q:[["What killed the bacteria in Fleming's dish?",["Heat","A mold","Sunlight","Bleach"],1],
+    ["Who figured out mass production?",["Fleming alone","Florey and Chain's team","Louis Pasteur","The U.S. Army"],1],
+    ["When was the Nobel Prize awarded?",["1928","1939","1945","1950"],2]]},
+{text:"Bamboo looks like a tree, but it is actually a grass, and it holds the record as one of the fastest growing plants on Earth. Some species can grow about three feet in a single day under ideal conditions. A bamboo shoot comes out of the ground at its full width and simply stretches upward, reaching its full height in just a few months. Bamboo has one other odd habit. Many species flower only once every several decades, and when they do, every plant of that species in a region flowers at the same time, even plants in different countries. After flowering, the plants usually die. The sudden flood of seeds can trigger booms in rat populations.",
+ q:[["What type of plant is bamboo?",["A tree","A grass","A fern","A vine"],1],
+    ["How fast can some bamboo grow?",["An inch a week","About three feet a day","A foot a year","Ten feet an hour"],1],
+    ["What usually happens after bamboo flowers?",["It doubles in size","It dies","It changes color","It grows fruit"],1]]},
+{text:"The Great Wall of China is not one continuous wall. It is a series of walls, trenches, and natural barriers built and rebuilt by different dynasties over roughly two thousand years. Most of the famous stone and brick sections tourists visit today were built during the Ming dynasty, which ruled from 1368 to 1644. Earlier walls were often made of packed earth and have largely worn away. Measured with all its branches, the wall system stretches more than 13,000 miles. A common claim says it is the only human-made structure visible from space with the naked eye. That is a myth. The wall is long but narrow, and it blends in with the land around it.",
+ q:[["Which dynasty built most famous surviving sections?",["Qin","Han","Ming","Tang"],2],
+    ["What were many earlier walls made of?",["Steel","Packed earth","Marble","Wood only"],1],
+    ["Is the wall visible from space with the naked eye?",["Yes, easily","No, that is a myth","Only at night","Only from the Moon"],1]]},
+{text:"A dog's sense of smell is far more powerful than a human's. Dogs have up to 300 million scent receptors in their noses, compared with about six million in people, and the part of the brain that analyzes smell is proportionally much larger. Their noses are built differently too. When a dog sniffs, air splits into two paths. One goes to the lungs for breathing, and the other goes to a special area just for smelling. Dogs can also breathe out through slits on the sides of the nose, so they can keep sniffing almost continuously. Each dog's nose has a unique pattern of ridges, much like a human fingerprint, which has been used to identify individual dogs.",
+ q:[["How many scent receptors can a dog have?",["About 6 million","About 30 million","Up to 300 million","Over a billion"],2],
+    ["What happens when a dog sniffs?",["Air splits into two paths","All air goes to the lungs","It holds its breath","It closes one nostril"],0],
+    ["What is unique about each dog's nose?",["Its color","Its ridge pattern","Its temperature","Its size"],1]]},
+{text:"The marathon is named after a legend from ancient Greece. A messenger named Pheidippides supposedly ran from the town of Marathon to Athens to announce a military victory, then collapsed and died. When the modern Olympics began in 1896, organizers created a long race to honor the story. Early marathons varied in length. The distance became fixed at 26.2 miles because of the 1908 London Olympics. The route was laid out to start at Windsor Castle and finish in front of the royal box in the Olympic stadium, which added up to exactly that distance. The odd number stuck, and it became the official standard in 1921. Today hundreds of marathons are held around the world every year.",
+ q:[["Where did the legendary messenger run to?",["Sparta","Athens","Olympia","Rome"],1],
+    ["Which Olympics set the 26.2-mile distance?",["1896 Athens","1908 London","1924 Paris","1936 Berlin"],1],
+    ["Where did the 1908 race finish?",["At Windsor Castle","In front of the royal box","At Big Ben","At the Thames"],1]]},
+{text:"Aluminum is one of the most recyclable materials in common use. It can be melted down and reused over and over without losing quality, so a large share of all the aluminum ever produced is still in use today. Recycling it also saves a huge amount of energy. Making a can from recycled aluminum takes about five percent of the energy needed to make one from raw ore, a savings of roughly ninety-five percent. The process is fast as well. A soda can tossed into a recycling bin can be collected, melted, rolled into new sheets, and back on a store shelf as a new can in as little as sixty days. Glass and steel are also highly recyclable.",
+ q:[["How many times can aluminum be recycled?",["Once","Five times","Over and over","Ten times"],2],
+    ["How much energy does recycling save?",["About 20 percent","About 50 percent","About 95 percent","None"],2],
+    ["How fast can a can return to the shelf?",["About 60 days","About a year","Five years","One week"],0]]},
+{text:"Mount Everest, on the border of Nepal and China, is the highest point on Earth at 29,032 feet above sea level. Climbers had attempted it for decades before May 29, 1953, when New Zealander Edmund Hillary and Tenzing Norgay, a Sherpa from Nepal, became the first people confirmed to reach the summit. They spent about fifteen minutes on top. Above roughly 26,000 feet lies what climbers call the death zone. The air there holds only about a third of the oxygen available at sea level, and the human body cannot adapt to it. Most climbers use bottled oxygen and try to spend as little time as possible at that altitude. Everest also grows a few millimeters taller each year.",
+ q:[["How tall is Mount Everest?",["20,310 feet","26,000 feet","29,032 feet","35,000 feet"],2],
+    ["Who reached the summit first in 1953?",["Hillary and Norgay","Mallory and Irvine","Two Swiss climbers","A British army team"],0],
+    ["What is the death zone?",["An avalanche area","Altitudes above about 26,000 feet","The base camp","A glacier"],1]]},
+{text:"Emperor penguins raise their young during the brutal Antarctic winter. After the female lays a single egg, she carefully passes it to the male and heads to the sea to feed. The male balances the egg on his feet and covers it with a warm fold of skin called a brood pouch. For about two months, he stands in darkness and fierce wind, eating nothing. To survive temperatures far below zero, thousands of males huddle together. The birds slowly rotate, so each one takes turns on the cold outside edge and in the warm center. By the time the female returns with food for the chick, the male may have lost nearly half his body weight.",
+ q:[["Who keeps the egg warm through winter?",["The female","The male","Both take turns daily","Other chicks"],1],
+    ["How long does the male go without eating?",["A week","About two months","Six months","He eats daily"],1],
+    ["How do penguins share warmth in the huddle?",["They rotate positions","They dig burrows","They stand still","They fly south"],0]]},
+{text:"The Blue Ridge Parkway is a scenic road that runs 469 miles along the crest of the Appalachian Mountains, connecting Shenandoah National Park in Virginia to Great Smoky Mountains National Park in North Carolina. Construction began in 1935 as a Depression-era project that put thousands of people to work. The road was designed for slow, scenic driving, with no stoplights, no billboards, and a speed limit that never goes above 45 miles per hour. The final section was not finished until 1987. That last piece was the Linn Cove Viaduct, a curving bridge built to wrap around the side of Grandfather Mountain without damaging its fragile slopes. The parkway is one of the most visited sites in the national park system.",
+ q:[["How long is the Blue Ridge Parkway?",["120 miles","469 miles","800 miles","1,200 miles"],1],
+    ["What is the top speed limit?",["35 mph","45 mph","55 mph","65 mph"],1],
+    ["What was the last section completed?",["Linn Cove Viaduct","Skyline Drive","Mount Mitchell road","Cherokee bridge"],0]]},
+{text:"Chess looks simple at the start. White has only twenty possible first moves: sixteen pawn moves and four knight moves. But the possibilities explode quickly. After each player has made just three moves, there are more than nine million possible positions. The total number of possible chess games is estimated to be far larger than the number of atoms in the observable universe. For decades, people believed computers could never beat the best human players. That changed in 1997, when IBM's Deep Blue defeated world champion Garry Kasparov in a six-game match. Today, even free chess apps on a phone can beat any human. Players now use computers mainly as training partners to study positions.",
+ q:[["How many first moves does White have?",["Ten","Sixteen","Twenty","Thirty-two"],2],
+    ["Who did Deep Blue defeat in 1997?",["Bobby Fischer","Magnus Carlsen","Garry Kasparov","Anatoly Karpov"],2],
+    ["How do players mostly use computers today?",["They are banned","As training partners","Only for tournaments","To keep score"],1]]}];
+let lastP=-1;
+function read(){stopTimer();
+  $('#panel').innerHTML=`<p class="big60">Read it before <span>time runs out</span></p><p>Under a minute, depending on your pace. Then answer 3 questions without looking back. Best: ${best.read||0}/3</p>
+  <label class="sel">Pace <select id="wpm"><option value="200">200 wpm</option><option value="250" selected>250 wpm</option><option value="300">300 wpm</option><option value="400">400 wpm</option></select></label>
+  <button class="btn" id="go">Start reading</button>`;
+  $('#go').onclick=()=>{const all=PASSAGES.map((_,k)=>k);let seen=store.get('bs-seen',[]).filter(x=>x<PASSAGES.length);
+    let pool=all.filter(k=>!seen.includes(k)&&k!==lastP);if(!pool.length){seen=[];pool=all.filter(k=>k!==lastP)}
+    const i=pickOne(pool);lastP=i;seen.push(i);store.set('bs-seen',seen);const P=PASSAGES[i];
+    const wpm=+$('#wpm').value,secs=Math.round(P.text.split(/\s+/).length/wpm*60);
+    $('#panel').innerHTML=`<div class="row" style="justify-content:space-between"><h2>Read</h2><div class="timer" id="t">${secs}</div></div>
+    <p class="passage">${P.text}</p><button class="btn ghost" id="done">Done reading</button>`;
+    const quiz=()=>{stopTimer();let qi=0,right=0;
+      const show=()=>{if(qi>=P.q.length){const nb=record('read',right);
+          $('#panel').innerHTML=`<h2>Speed Read</h2><div class="score">${right}/3</div><p>${nb?'New personal best.':'Best so far: '+best.read+'/3.'} ${right===3?'Try a faster pace next time.':right<2?'Try a slower pace to build accuracy first.':''}</p>
+          <div class="row"><button class="btn" id="again">Another passage</button><button class="btn ghost" id="next">Next: Spanish Sprint</button></div>`;$('#again').onclick=read;$('#next').onclick=()=>select('spanish');return}
+        const [qq,opts,ans]=P.q[qi];
+        $('#panel').innerHTML=`<h2>Question ${qi+1} of 3</h2><p class="prompt">${qq}</p><div style="display:flex;flex-direction:column;gap:8px">${opts.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div>`;
+        document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(k===ans)right++;
+          b.classList.add(k===ans?'right':'wrong');document.querySelectorAll('.opt')[ans].classList.add('right');
+          document.querySelectorAll('.opt').forEach(x=>x.disabled=true);setTimeout(()=>{qi++;show()},700)})};show()};
+    $('#done').onclick=quiz;countdown(secs,$('#t'),quiz)}}
+
+/* ---------- Spanish Sprint ---------- */
+const ES=[
+["Quiero comer","I want to eat"],["Necesito ayuda","I need help"],["Tengo hambre","I'm hungry"],["Tengo sed","I'm thirsty"],
+["Tengo frío","I'm cold"],["Tengo calor","I'm hot"],["Estoy cansado","I'm tired"],["Quiero dormir","I want to sleep"],
+["Necesito ir al baño","I need to go to the bathroom"],["¿Dónde está el baño?","Where is the bathroom?"],["¿Cuánto cuesta?","How much does it cost?"],
+["¿Qué hora es?","What time is it?"],["¿Cómo te llamas?","What's your name?"],["Me llamo Ana","My name is Ana"],
+["Mucho gusto","Nice to meet you"],["¿Cómo estás?","How are you?"],["Estoy bien, gracias","I'm fine, thanks"],
+["Buenos días","Good morning"],["Buenas tardes","Good afternoon"],["Buenas noches","Good night"],["Hasta mañana","See you tomorrow"],
+["Hasta luego","See you later"],["Por favor","Please"],["De nada","You're welcome"],["Lo siento","I'm sorry"],["Con permiso","Excuse me"],
+["No entiendo","I don't understand"],["¿Puedes repetir?","Can you repeat that?"],["Más despacio, por favor","Slower, please"],
+["¿Hablas inglés?","Do you speak English?"],["Hablo un poco de español","I speak a little Spanish"],["¿Qué significa eso?","What does that mean?"],
+["Quiero agua","I want water"],["La cuenta, por favor","The check, please"],["Me gusta mucho","I like it a lot"],["No me gusta","I don't like it"],
+["Quiero un café","I want a coffee"],["¿Qué quieres comer?","What do you want to eat?"],["Está delicioso","It's delicious"],
+["Tengo que trabajar","I have to work"],["Voy a la escuela","I'm going to school"],["Vamos a jugar","Let's play"],["¿Dónde vives?","Where do you live?"],
+["Vivo en Carolina del Norte","I live in North Carolina"],["Tengo un perro","I have a dog"],["Mi esposa","My wife"],["Mi mamá","My mom"],
+["Te quiero","I love you"],["¿Quieres ir conmigo?","Do you want to go with me?"],["Necesito comprar comida","I need to buy food"],
+["¿A qué hora?","At what time?"],["Ahora mismo","Right now"],["Más tarde","Later"],["Todos los días","Every day"],["¿Por qué?","Why?"],
+["Porque sí","Just because"],["Tengo prisa","I'm in a hurry"],["Estoy listo","I'm ready"],["¿Estás listo?","Are you ready?"],
+["Ten cuidado","Be careful"],["Ven aquí","Come here"],["Siéntate, por favor","Sit down, please"],["Escucha","Listen"],
+["Buen trabajo","Good job"],["¡Vamos, equipo!","Let's go, team!"],["Corre más rápido","Run faster"],["Pasa el balón","Pass the ball"],
+["¿Qué pasó?","What happened?"],["No pasa nada","No big deal"],["Me duele la cabeza","My head hurts"],["Necesito descansar","I need to rest"],
+["Hace calor hoy","It's hot today"],["Está lloviendo","It's raining"],["¿Puedo ayudarte?","Can I help you?"],["Claro que sí","Of course"],
+["Tal vez","Maybe"],["No sé","I don't know"],["Creo que sí","I think so"],["¿Dónde está mi teléfono?","Where is my phone?"],
+["Quiero ir a la playa","I want to go to the beach"],["Me voy a casa","I'm going home"],["Nos vemos pronto","See you soon"],["Que tengas un buen día","Have a good day"],
+["Feliz cumpleaños","Happy birthday"],["¿Tienes tiempo?","Do you have time?"],["Estoy aprendiendo español","I'm learning Spanish"]];
+let soundOn=store.get('bs-sound',true),esVoice=null;
+function pickVoice(){try{const v=speechSynthesis.getVoices().filter(x=>/^es/i.test(x.lang));
+  esVoice=v.find(x=>/es-(MX|US)/i.test(x.lang))||v[0]||null}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function say(t,force){if(!soundOn&&!force)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[¿¡]/g,''));
+  u.lang=esVoice?esVoice.lang:'es-MX';if(esVoice)u.voice=esVoice;u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+function spanish(){stopTimer();
+  $('#panel').innerHTML=`<p class="big60">You have <span>60 seconds</span> to do this.</p>
+  <p class="prompt">See a phrase, tap what it means. Some show Spanish, some show English.</p>
+  <p class="note">You'll hear each phrase in Spanish and see the full phrase after every answer. Best: ${best.spanish||0}</p>
+  <label class="sound"><input type="checkbox" id="snd" ${soundOn?'checked':''}> Speak phrases out loud</label>
+  <button class="btn" id="go">Start 60 seconds</button>`;
+  $('#snd').onchange=e=>{soundOn=e.target.checked;store.set('bs-sound',soundOn)};
+  $('#go').onclick=()=>{say('¡Vamos!');let right=0,over=false;const seen=[];const deck=shuffle(ES.map((_,k)=>k));let di=0;
+    $('#panel').innerHTML=`<div class="row" style="justify-content:space-between"><h2>Spanish Sprint</h2><div class="timer" id="t">60</div></div><div id="q" style="display:flex;flex-direction:column;gap:12px"></div>`;
+    const ask=()=>{if(over)return;const k=deck[di++%deck.length];const [es,en]=ES[k];const toEn=Math.random()<.65;
+      const others=shuffle(ES.map((_,x)=>x).filter(x=>x!==k)).slice(0,3);const opts=shuffle([k,...others]);
+      $('#q').innerHTML=`<div class="qhead"><p class="es">${toEn?es:en}</p>${toEn?`<button class="spk" id="qs" aria-label="Hear it">🔊</button>`:''}</div><p class="en">${toEn?'What does this mean?':'How do you say it in Spanish?'}</p>
+      <div style="display:flex;flex-direction:column;gap:8px">${opts.map(o=>`<button class="opt" data-k="${o}">${toEn?ES[o][1]:ES[o][0]}</button>`).join('')}</div>`;
+      if(toEn){say(es);$('#qs').onclick=()=>say(es,true)}
+      document.querySelectorAll('#q .opt').forEach(b=>b.onclick=()=>{if(over)return;const ok=+b.dataset.k===k;if(ok)right++;seen.push([k,ok]);
+        document.querySelectorAll('#q .opt').forEach(x=>{x.disabled=true;if(+x.dataset.k===k)x.classList.add('right')});if(!ok)b.classList.add('wrong');
+        $('#q').insertAdjacentHTML('beforeend',`<div class="flash"><div class="txt"><b>${es}</b><span>${en}</span></div><button class="spk" id="fs" aria-label="Hear it">🔊</button></div>`);
+        $('#fs').onclick=()=>say(es,true);say(es);setTimeout(ask,ok?1700:2600)})};
+    ask();
+    countdown(60,$('#t'),()=>{over=true;const nb=record('spanish',right);
+      $('#panel').innerHTML=`<h2>Spanish Sprint</h2><div class="score">${right} correct</div><p>${nb?'New personal best.':'Best so far: '+best.spanish+'.'}</p>
+      ${seen.length?`<p class="note">Today's phrases</p><div class="review">${seen.map(([k,ok])=>`<div><span class="mk ${ok?'ok':'no'}">${ok?'✓':'✗'}</span><span class="pair"><b>${ES[k][0]}</b><span>${ES[k][1]}</span></span><button class="spk" data-say="${k}" aria-label="Hear it">🔊</button></div>`).join('')}</div>`:''}
+      <div class="row"><button class="btn" id="again">Play again</button><button class="btn ghost" id="next">Finish: Breathe</button></div>`;$('#again').onclick=spanish;$('#next').onclick=()=>select('breathe');
+      document.querySelectorAll('.review .spk').forEach(b=>b.onclick=()=>say(ES[+b.dataset.say][0],true))})}}
+
+/* ---------- Breathe ---------- */
+const THOUGHTS=['emails','to-do list','laundry','lesson plans','dinner?','bills','meetings','texts','deadlines','errands','what if...','tomorrow'];
+const BRAIN_SVG=document.getElementById('brain').innerHTML;
+function breathe(){stopTimer();
+  $('#panel').innerHTML=`<p class="big60">Breathe for <span>1 minute</span></p>
+  <p class="prompt">Watch the brain. Breathe in as it grows for 4 seconds, and out as it shrinks for 6 seconds.</p>
+  <p class="note">With each breath out, a few thoughts float away. About 6 slow breaths in all.</p>
+  <button class="btn" id="go">Start breathing</button>`;
+  $('#go').onclick=()=>{
+    const pos=[[22,7],[78,7],[50,18],[16,30],[84,30],[15,50],[85,50],[16,70],[84,70],[50,82],[26,93],[74,93]];
+    $('#panel').innerHTML=`<div class="row" style="justify-content:space-between"><h2>Breathe</h2><div class="timer" id="t">60</div></div>
+    <div class="stage" aria-hidden="true"><svg class="bbrain" id="bb" viewBox="0 0 120 100">${BRAIN_SVG}</svg>
+    ${THOUGHTS.map((t,i)=>`<span class="bub" style="left:${pos[i][0]}%;top:${pos[i][1]}%;animation-delay:${(i*0.37).toFixed(2)}s">${t}</span>`).join('')}</div>
+    <div class="cue" aria-live="polite"><span class="word" id="cw">Breathe in</span><span class="count" id="cc">4</span></div>`;
+    const bb=$('#bb'),bubs=shuffle([...document.querySelectorAll('.bub')]);let el=0;
+    const phase=()=>{const c=el%10;if(c===0){bb.classList.remove('out');void bb.getBoundingClientRect();bb.classList.add('in');$('#cw').textContent='Breathe in'}
+      if(c===4){bb.classList.remove('in');bb.classList.add('out');$('#cw').textContent='Breathe out';const n=Math.floor(el/10);bubs.slice(n*2,n*2+2).forEach(b=>b.classList.add('gone'))}
+      $('#cc').textContent=c<4?4-c:10-c;$('#t').textContent=60-el};
+    phase();
+    timer=setInterval(()=>{el++;if(el>=60){stopTimer();bubs.forEach(b=>b.classList.add('gone'));$('#t').textContent=0;
+        setTimeout(()=>{record('breathe',1);
+          $('#panel').innerHTML=`<div class="calm"><svg class="brain" viewBox="0 0 120 100" style="width:120px">${BRAIN_SVG}</svg>
+          <div class="score">Clear mind</div><p>Nice work. That's today's Brain Sprint done.</p>${verseOn?`<p style="max-width:40ch"><em>${todaysVerse()[1]}</em><br><b style="color:var(--accent)">${todaysVerse()[0]}</b></p>`:''}
+          <div class="row" style="justify-content:center"><button class="btn" id="again">Breathe again</button></div></div>`;$('#again').onclick=breathe},1200);return}
+      phase()},1000)}}
+
+const DRILLS={word,recall,read,spanish,breathe};
+function select(k){document.querySelectorAll('.pick').forEach(b=>b.setAttribute('aria-pressed',b.dataset.drill===k));DRILLS[k]()}
+document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>select(b.dataset.drill));
+$('#shareTop').onclick=shareScores;$('#shareClose').onclick=()=>{$('#shareBox').hidden=true};
+const DEVOS=[["Check the filter", "Proverbs 4:23", "Keep thy heart with all diligence; for out of it are the issues of life.", "Your furnace has a filter. Skip changing it and the whole house breathes dust. Your heart works the same way. The news, the comment section, the grudge you keep replaying, it all gets pulled through the system. Your brain naturally grabs onto bad news faster than good, so the junk sticks harder than you think. That's why guarding takes diligence and not just good intentions. Today, notice one thing you keep letting in that leaves you heavier. Trade it for five quiet minutes with God. Clean filter, clean air.", "Lord, help me guard what gets into my heart today."], ["Cutting a new trail", "Philippians 4:8", "Whatsoever things are true, whatsoever things are honest, whatsoever things are just, whatsoever things are pure, whatsoever things are lovely, whatsoever things are of good report; think on these things.", "Walk across a field of tall grass once and you barely leave a mark. Walk it every day and you've got a trail. Your brain works like that. Whatever you think about most gets easier to think about again. Paul isn't asking you to pretend problems don't exist. He's telling you to choose which trail you keep walking. This morning, replay one good moment from yesterday on purpose. You're cutting a new path.", "Father, train my thoughts toward what is good and true."], ["Second wind", "Isaiah 40:31", "But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint.", "Anyone who has run hard knows the moment your legs say quit. Keep going a little longer and sometimes a second wind shows up out of nowhere. Isaiah promises a strength that doesn't come from your own tank. Waiting on the Lord isn't sitting on the bench. It's staying connected to Him while you keep moving. When you hit the wall today, that's not the end of the race. That's the spot where His strength takes over.", "Lord, renew my strength when mine runs out."], ["One quiet minute", "Psalm 46:10", "Be still, and know that I am God.", "The phone buzzes, the bell rings, the list grows. Stillness can feel like wasted time. But your body does its best repair work at rest. Your heart rate drops, your breathing deepens, your muscles recover. Your spirit is the same way. It can't hear much while everything is running at full speed. You just practiced one quiet minute in the breathing game. Try one more today, no phone, and simply remember who is in charge.", "God, quiet my mind long enough to hear You."], ["Stay lit", "Matthew 5:14", "Ye are the light of the world. A city that is set on an hill cannot be hid.", "A lighthouse never chases ships around the ocean. It stays lit and stays put, right where the rocks are. That's the whole job. You have been placed in a school, on a field, in a neighborhood, on purpose. You don't have to fix every dark spot around you. You just have to stay lit where you're planted. Somebody today is looking for the light and they will find it in how you treat them.", "Jesus, keep my light burning right where You put me."], ["Make the call", "Joshua 1:9", "Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.", "Every referee knows the feeling. Whatever you call, half the stadium disagrees. Courage was never the absence of fear. It's making the right call while your heart is pounding. Joshua was stepping into a job way bigger than him, and God's answer wasn't a pep talk about his skills. It was a promise of presence. Whatever hard call you face today, you're not standing on that field alone.", "Lord, give me courage to do the right thing today."], ["Good medicine", "Proverbs 17:22", "A merry heart doeth good like a medicine: but a broken spirit drieth the bones.", "Solomon knew this long before the research caught up. A real laugh relaxes your muscles, lowers stress, and lifts your mood for a while after. Kids get this naturally. Watch a gym full of them and you'll hear laughing all day long. Somewhere along the way adults start taking everything so seriously. Joy isn't a distraction from faith. It's evidence of it. Find something to laugh about today, and share it with someone.", "Father, give me a merry heart and help me spread it."], ["New every morning", "Lamentations 3:22-23", "It is of the LORD's mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness.", "While you sleep, your brain does a kind of overnight cleanup, clearing out the waste from the day before. Morning really is a reset. God built that into your body, and He built it into His mercy too. Yesterday's mistake does not get the first word today. His compassion showed up fresh this morning, before your feet hit the floor. Start the day from there, not from yesterday's scoreboard.", "Thank You, Lord, that Your mercy is new today."], ["Put the backpack down", "1 Peter 5:7", "Casting all your care upon him; for he careth for you.", "Watch a kid haul an overloaded backpack down the hallway, shoulders hunched, walking crooked. Worry does that to us. Carry it long enough and you'll feel it in tight shoulders, a clenched jaw, a short temper. Peter's word is cast, like throwing a line. Not set it down gently, but toss it over to the One who can actually carry it. Name one worry right now, out loud, and hand it over.", "Lord, I give You this worry. Thank You for caring for me."], ["Seeds you can't see", "Galatians 6:9", "And let us not be weary in well doing: for in due season we shall reap, if we faint not.", "A farmer plants in spring and doesn't see much for weeks. Under the dirt, roots are going down long before anything shows. Teachers, coaches and parents live this every day. You plant and plant, and some of it you won't see grow for years. Some of it you may never see. Don't measure today's work by today's results. Keep planting good. The harvest is on God's timeline, not ours.", "Father, keep me faithful in the small things."], ["Wonderfully made", "Psalm 139:14", "I will praise thee; for I am fearfully and wonderfully made: marvellous are thy works; and that my soul knoweth right well.", "Your heart beats about a hundred thousand times a day without you asking it to. Your brain holds billions of connections, rewiring itself every time you learn something new, like a Spanish phrase this morning. Your lungs, your eyes, the way a cut heals on its own. None of it is an accident. When you feel ordinary, remember the Designer didn't make anything ordinary. Take care of the body He gave you today.", "Lord, thank You for how You made me. Help me care for it well."], ["Renewing the mind", "Romans 12:2", "And be not conformed to this world: but be ye transformed by the renewing of your mind.", "Habits are built by repetition. Do something enough times and your brain puts it on autopilot. That works both ways. Scroll every morning and your mind expects noise first thing. Open God's Word every morning and it starts expecting truth. Transformation isn't one big moment. It's the daily rep, the same as building strength in the gym. Your brain is literally being renewed by what you practice. Keep showing up.", "Father, renew my mind one day at a time."], ["Race light", "Hebrews 12:1", "Let us lay aside every weight, and the sin which doth so easily beset us, and let us run with patience the race that is set before us.", "Nobody runs a race in work boots and a winter coat. Runners strip down to what helps them move. What extra weight are you hauling today? Maybe it's an old regret, a habit you keep feeding, or somebody else's opinion of you. None of it is helping you run. Notice the word patience too. Life is a long race, not a sprint. Drop the weight and settle into your pace.", "Lord, show me what to lay down so I can run free."], ["Letting go", "Ecclesiastes 3:1", "To every thing there is a season, and a time to every purpose under the heaven.", "Every fall, the trees let go of their leaves. It looks like loss, but it's how they survive the winter and come back strong in spring. Some seasons ask us to hold on. Others ask us to let go of a role, a plan, or a way things used to be. Neither one means God has left. Ask Him today which season you're in, and trust that spring is coming.", "Father, help me trust You in every season."], ["Lower the volume", "Proverbs 15:1", "A soft answer turneth away wrath: but grievous words stir up anger.", "Ever notice what happens when a coach on the sideline starts yelling and the official answers calmly? Usually the volume comes down on both sides. Anger is contagious, but so is calm. When someone comes at you hot today, your brain will want to match them. Take one slow breath first. A soft answer isn't weakness. It's strength under control, and it can end a fight before it starts.", "Lord, give me a soft answer when I want to fire back."], ["Come and rest", "Matthew 11:28", "Come unto me, all ye that labour and are heavy laden, and I will give you rest.", "Some tired isn't fixed by sleep. You can get eight hours and still wake up worn out, because the weight is on your spirit, not just your body. Jesus doesn't say come once you've got it together. He says come when you're heavy. Rest starts with going to Him. Before the day gets loud, tell Him exactly how tired you are. He's not surprised, and He's not disappointed. He's inviting you.", "Jesus, I'm coming to You. Give me Your rest."], ["Today is the gift", "Psalm 118:24", "This is the day which the LORD hath made; we will rejoice and be glad in it.", "Studies on gratitude keep finding the same thing. People who regularly write down what they're thankful for tend to feel better and even sleep better. The psalmist didn't need a study. He decided to rejoice in the day before he knew how it would go. Rejoicing is a choice before it's a feeling. Name three things right now you're thankful for. This day was made on purpose, and so were you.", "Lord, thank You for this day. Help me rejoice in it."], ["A sound mind", "2 Timothy 1:7", "For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.", "When fear hits, your body goes into fight or flight. Heart races, breathing gets quick and shallow, thinking gets cloudy. One of the fastest ways to calm that down is a slow breath out, like the one in the breathing game. It tells your body you're safe. Paul reminds us fear isn't from God. What He gave you is power, love, and a sound mind. Breathe slow, and stand on that.", "Father, replace my fear with Your peace and a clear mind."], ["Rock in your shoe", "Ephesians 4:32", "And be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ's sake hath forgiven you.", "Holding a grudge is like keeping a rock in your shoe and hoping the other person limps. You're the one who feels it every step. Bitterness wears on the body too, keeping you tense and on guard. Forgiveness doesn't mean what they did was fine. It means you're done carrying it. Think of the person you'd rather not think about. Hand the rock to God, and walk lighter today.", "Lord, help me forgive the way You forgave me."], ["Whatever you do", "Colossians 3:23", "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.", "Recess duty. Laundry. A seven a.m. game nobody's watching. Paperwork that never ends. It's easy to give the small stuff half effort. But Paul says whatever you do, do it with your whole heart, because you're really doing it for the Lord. That changes the meaning of every ordinary task. Pick the most boring thing on your list today and give it your best, as an offering.", "Lord, let my work today be for You."], ["Look up", "Psalm 121:1-2", "I will lift up mine eyes unto the hills, from whence cometh my help. My help cometh from the LORD, which made heaven and earth.", "Most of our day is spent looking down at screens, at the next task, at the floor while we walk and think. The psalmist made a point of looking up. Lifting your eyes changes your perspective. The problem in front of you looks smaller next to the mountains. Step outside today, look at the sky for a minute, and remember who made it. Your help is coming from there.", "Lord, lift my eyes off my problems and onto You."], ["Locked on", "Isaiah 26:3", "Thou wilt keep him in perfect peace, whose mind is stayed on thee: because he trusteth in thee.", "A compass needle gets bumped and spun, but it always swings back to north. That's what stayed means. Your mind will wander today, toward worry, plans, other people's drama. That's normal. Peace comes from swinging back. Every time you notice your thoughts drifting, point them back to God with one simple sentence. You trust Him. Do it as many times as it takes. That's how perfect peace is kept.", "Lord, keep my mind fixed on You today."], ["Good cheer", "John 16:33", "In the world ye shall have tribulation: but be of good cheer; I have overcome the world.", "Jesus never promised an easy road. He said straight out that this world brings trouble. But then He said cheer up, because He already won. It's like watching a replay of a game when you already know the final score. The tough moments still sting, but you're not panicking, because you know how it ends. Whatever trouble shows up today, it doesn't get the last word.", "Jesus, thank You that You have already overcome."], ["Three things", "Micah 6:8", "He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?", "Life can feel complicated, with a hundred voices telling you what matters. Micah keeps it to three things. Do what's right. Love showing mercy. Walk humbly with God. That's a list that fits on an index card. Before you make a decision today, big or small, run it through those three questions. Is it right? Is it kind? Am I walking with God or running ahead of Him?", "Lord, help me live justly, love mercy, and walk humbly."], ["Green pastures", "Psalm 23:1-2", "The LORD is my shepherd; I shall not want. He maketh me to lie down in green pastures: he leadeth me beside the still waters.", "Spending time outside in green spaces is linked to lower stress and a calmer mind. David the shepherd knew it from experience. Notice the shepherd makes the sheep lie down. Sometimes rest has to be led, because we won't choose it on our own. If you can, get outside today, even ten minutes. Walk on grass, sit by water, breathe fresh air. Let the Shepherd lead you there.", "Lord, lead me to rest and still waters today."], ["Two ears, one mouth", "James 1:19", "Wherefore, my beloved brethren, let every man be swift to hear, slow to speak, slow to wrath.", "There's a reason we have two ears and one mouth. Most arguments happen because both people are waiting to talk instead of listening. James gives the order. Hear first. Speak second. Anger last, if at all. Listening well is one of the kindest things you can do for someone. Today, in one conversation, let the other person finish completely before you answer. Watch how it changes the conversation.", "Lord, make me quick to listen and slow to anger."], ["Trust the route", "Proverbs 3:5-6", "Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.", "Ever followed a GPS that took a turn you didn't understand, only to find out later it avoided a wreck you couldn't see? Our understanding only sees the road right in front of us. God sees the whole map. Leaning on Him means taking the turn even when it doesn't make sense yet. Bring Him into every decision today, not just the big ones, and let Him direct the path.", "Father, I trust Your directions over my own."], ["Go where the fish are", "Matthew 4:19", "And he saith unto them, Follow me, and I will make you fishers of men.", "Any fisherman will tell you the fish aren't coming to your bathtub. You have to go where they are, and the best catches are usually in the roughest water. Jesus called fishermen because they understood that. Following Him means going where people are hurting, not hiding where it's comfortable. Your school, your field, your neighborhood are full of people who need what you've got. Cast your line today.", "Jesus, send me where I'm needed most."], ["Joy is strength", "Nehemiah 8:10", "The joy of the LORD is your strength.", "We usually think strength comes from discipline, effort, grit. Nehemiah says it comes from joy. Not your joy in good circumstances, but the joy of the Lord, which doesn't rise and fall with your day. People were weeping when they heard this, and Nehemiah told them to celebrate instead. Joy gives you energy to keep going. Ask God to fill you with His joy today, not just your own.", "Lord, let Your joy be my strength today."], ["Lie down in peace", "Psalm 4:8", "I will both lay me down in peace, and sleep: for thou, LORD, only makest me dwell in safety.", "Good sleep is one of the best things you can do for your brain. It's when memories get locked in and your body recovers. But a racing mind and a glowing screen at bedtime make it hard. David slept in peace even with enemies around, because he trusted who was keeping watch. Tonight, put the phone down a little early, hand the day back to God, and rest.", "Lord, I trust You with tonight. Give me peaceful sleep."]];
+let verseOn=true;
+if(location.hash==='#verse'){verseOn=true;store.set('bs-verse',true)}
+if(location.hash==='#noverse'){verseOn=false;store.set('bs-verse',false)}
+function todaysDevo(){const n=new Date(),day=Math.floor((Date.UTC(n.getFullYear(),n.getMonth(),n.getDate()))/864e5);return DEVOS[day%DEVOS.length]}
+function todaysVerse(){const d=todaysDevo();return [d[1],d[2]]}
+if(verseOn){const [title,ref,txt,body,pray]=todaysDevo();$('#vtitle').textContent=title;$('#vt').textContent=txt;$('#vr').textContent=ref+' (KJV)';$('#vbody').textContent=body;$('#vpray').textContent=pray;$('#dailyVerse').hidden=false}
+refresh();word();
+</script>
+
+</body>
+</html>
