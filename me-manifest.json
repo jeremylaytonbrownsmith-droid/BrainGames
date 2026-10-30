@@ -1,18 +1,18 @@
 {
-  "name": "Brain Sprint",
-  "short_name": "Brain Sprint",
+  "name": "Brain Body Sprint",
+  "short_name": "Brain Body Sprint",
   "start_url": "./me.html",
   "display": "standalone",
   "background_color": "#fff0f4",
   "theme_color": "#fff0f4",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-me-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-me-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

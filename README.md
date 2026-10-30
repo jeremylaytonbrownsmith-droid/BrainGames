@@ -1,4 +1,4 @@
-# Brain Sprint
+# Brain Body Sprint
 
 Daily 5-minute brain workout: Word Sprint, Rapid Recall, Speed Read, Spanish Sprint, and a 1-minute breathing cooldown.
 
